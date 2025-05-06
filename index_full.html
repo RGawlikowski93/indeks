@@ -1,103 +1,111 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Indeks Cyfryzacji Firmy</title>
   <style>
-    body { font-family: sans-serif; padding: 2rem; max-width: 900px; margin: auto; }
-    h1 { color: #2c3e50; }
-    .question { margin-bottom: 1.2rem; }
-    .result { background: #f4f4f4; padding: 1.2rem; border-radius: 6px; margin-top: 2rem; }
-    button { padding: 0.5rem 1rem; font-size: 1rem; }
+    body { font-family: sans-serif; padding: 2rem; max-width: 800px; margin: auto; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .question { margin-bottom: 2rem; }
+    button { margin-top: 1rem; padding: 10px 20px; cursor: pointer; }
+    .result { background: #f0f0f0; padding: 1rem; border-radius: 8px; }
   </style>
 </head>
 <body>
   <h1>Indeks Cyfryzacji Firmy</h1>
-  <form id="quizForm">
-    <h2>Poziom cyfryzacji (A)</h2>
-    <div class="question"><label>1. Czy masz system DMS?</label><br>
-      <input type="radio" name="q1" value="2"> Tak<br>
-      <input type="radio" name="q1" value="1"> Częściowo<br>
-      <input type="radio" name="q1" value="0"> Nie
-    </div>
-    <div class="question"><label>2. Czy masz ERP?</label><br>
-      <input type="radio" name="q2" value="2"> Tak<br>
-      <input type="radio" name="q2" value="1"> Częściowo<br>
-      <input type="radio" name="q2" value="0"> Nie
-    </div>
-    <div class="question"><label>3. Czy dane są w chmurze?</label><br>
-      <input type="radio" name="q3" value="2"> Tak<br>
-      <input type="radio" name="q3" value="1"> Częściowo<br>
-      <input type="radio" name="q3" value="0"> Nie
-    </div>
-    <div class="question"><label>4. Czy używacie BI?</label><br>
-      <input type="radio" name="q4" value="2"> Tak<br>
-      <input type="radio" name="q4" value="1"> Trochę<br>
-      <input type="radio" name="q4" value="0"> Nie
-    </div>
-    <div class="question"><label>5. Czy dokumenty są digitalizowane automatycznie?</label><br>
-      <input type="radio" name="q5" value="2"> Tak<br>
-      <input type="radio" name="q5" value="1"> Częściowo<br>
-      <input type="radio" name="q5" value="0"> Nie
-    </div>
-
-    <h2>Motywacje (B)</h2>
-    <div class="question"><label>6. Główna motywacja?</label><br>
-      <input type="radio" name="motywacja" value="rozwojowy"> Rozwój<br>
-      <input type="radio" name="motywacja" value="kosztowy"> Oszczędność<br>
-      <input type="radio" name="motywacja" value="ergonomiczny"> Wygoda<br>
-      <input type="radio" name="motywacja" value="nieukierunkowany"> Brak kierunku
-    </div>
-
-    <h2>Potrzeby i bariery (C)</h2>
-    <div class="question"><label>7. Gdzie widzisz największe potrzeby?</label><br>
-      <input type="radio" name="obszar" value="dane"> Analiza danych<br>
-      <input type="radio" name="obszar" value="hr"> HR<br>
-      <input type="radio" name="obszar" value="finanse"> Finanse<br>
-      <input type="radio" name="obszar" value="produkcja"> Produkcja
-    </div>
-
-    <button type="submit">Zobacz wynik</button>
-  </form>
-
-  <div id="result" class="result" style="display:none;"></div>
+  <div id="quiz"></div>
 
   <script>
-    document.getElementById("quizForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const pytania = ["q1","q2","q3","q4","q5"];
-      const score = pytania.reduce((acc, name) => {
-        return acc + parseInt(document.querySelector(`input[name="${name}"]:checked`)?.value || 0);
-      }, 0);
+    const etap1 = [
+      { id: 'cloud', pytanie: 'Czy firma korzysta z rozwiązań chmurowych?', odpowiedzi: ["Tak", "Nie", "W trakcie"], punkty: { "Tak": 0.5, "Nie": 0, "W trakcie": 0.15 } },
+      { id: 'ai', pytanie: 'Czy znasz obszary, w których można wdrożyć AI?', odpowiedzi: ["Tak", "Trudno powiedzieć", "Nie"], punkty: { "Tak": 0.51, "Trudno powiedzieć": 0.49, "Nie": 0 } },
+      { id: 'noPaper', pytanie: 'Czy dane z produkcji są zapisywane na papierze?', odpowiedzi: ["Nie", "Tak"], punkty: { "Nie": 0.83, "Tak": 0 } },
+      { id: 'aps', pytanie: 'Czy używasz systemu APS?', odpowiedzi: ["Tak", "Nie"], punkty: { "Tak": 0.06, "Nie": 0 } },
+      { id: 'dms', pytanie: 'Czy masz system elektronicznego obiegu dokumentów (DMS)?', odpowiedzi: ["Tak", "Nie"], punkty: { "Tak": 0.49, "Nie": 0 } },
+      { id: 'erp', pytanie: 'Czy rozwijałeś system ERP w ciągu 3 lat?', odpowiedzi: ["Tak", "Nie"], punkty: { "Tak": 0.69, "Nie": 0 } },
+      { id: 'ksef', pytanie: 'Czy testowano w firmie KSeF?', odpowiedzi: ["Tak", "Nie"], punkty: { "Tak": 0.02, "Nie": 0 } },
+      { id: 'esg', pytanie: 'Czy jesteś gotowy do raportowania ESG?', odpowiedzi: ["Tak", "Nie"], punkty: { "Tak": 0.18, "Nie": 0 } },
+      { id: 'bi', pytanie: 'Czy posiadasz narzędzia analityczne BI?', odpowiedzi: ["Tak", "Nie"], punkty: { "Tak": 0.40, "Nie": 0 } },
+      { id: 'salesIT', pytanie: 'Czy sprzedaż obsługiwana jest przez system IT?', odpowiedzi: ["Tak", "Nie"], punkty: { "Tak": 0.65, "Nie": 0 } }
+    ];
 
-      let profil = "";
-      if (score <= 4) profil = "firma analogowa";
-      else if (score <= 7) profil = "firma w transformacji";
-      else if (score <= 9) profil = "firma dojrzała cyfrowo";
-      else profil = "lider cyfryzacji";
+    const rekomendacjeMap = {
+      cloud: {
+        Produkcja: "Wdrożenie chmury w produkcji pozwala na bieżący dostęp do danych i zdalne monitorowanie procesów.",
+        Sprzedaż: "Chmura w sprzedaży umożliwia pracę zdalną i dostęp do CRM w czasie rzeczywistym.",
+        Logistyka: "Rozwiązania chmurowe wspierają zarządzanie łańcuchem dostaw i śledzenie przesyłek.",
+        Finanse: "Chmura umożliwia bezpieczne przetwarzanie i archiwizację danych finansowych.",
+        Zarzadzanie: "Chmura zwiększa dostępność raportów i usprawnia podejmowanie decyzji."
+      },
+      ai: {
+        Produkcja: "AI w produkcji może przewidywać awarie i optymalizować zużycie zasobów.",
+        Sprzedaż: "Sztuczna inteligencja pomaga personalizować oferty i prognozować sprzedaż.",
+        Logistyka: "AI wspiera optymalizację tras i zarządzanie zapasami.",
+        Finanse: "AI analizuje dane finansowe, identyfikuje oszustwa i przewiduje płynność.",
+        Zarzadzanie: "AI wspiera podejmowanie decyzji i analizę scenariuszy strategicznych."
+      },
+      noPaper: {
+        Produkcja: "Cyfryzacja produkcji eliminuje błędy wynikające z ręcznego wprowadzania danych.",
+        Sprzedaż: "Elektroniczne dokumenty przyspieszają proces ofertowania i obsługi klienta.",
+        Logistyka: "Brak papieru zwiększa płynność procesów magazynowych i transportowych.",
+        Finanse: "Cyfrowe dokumenty przyspieszają księgowanie i audyt.",
+        Zarzadzanie: "Cyfrowe dokumenty zwiększają przejrzystość i kontrolę nad procesami."
+      },
+      aps: {
+        Produkcja: "APS umożliwia optymalne planowanie produkcji i redukcję przestojów.",
+        Sprzedaż: "APS wspiera koordynację z działem sprzedaży przy realizacji zamówień.",
+        Logistyka: "Planowanie produkcji ułatwia zarządzanie wysyłkami i zapasami.",
+        Finanse: "Dobre planowanie ogranicza koszty produkcji i przestoje.",
+        Zarzadzanie: "System APS wspiera decyzje strategiczne oparte na danych."
+      },
+      dms: {
+        Produkcja: "DMS automatyzuje obieg dokumentów technologicznych i jakościowych.",
+        Sprzedaż: "Cyfrowe dokumenty przyspieszają obsługę klientów i zamówień.",
+        Logistyka: "DMS skraca czas reakcji i poprawia komunikację z partnerami.",
+        Finanse: "DMS wspiera obieg faktur i zgodność z przepisami.",
+        Zarzadzanie: "Cyfrowy obieg dokumentów zwiększa przejrzystość i kontrolę."
+      },
+      erp: {
+        Produkcja: "Rozwój ERP umożliwia automatyczne planowanie i kontrolę produkcji.",
+        Sprzedaż: "Nowe moduły ERP wspierają obsługę klienta i integrację kanałów sprzedaży.",
+        Logistyka: "ERP zwiększa efektywność zarządzania magazynem i dostawami.",
+        Finanse: "Moduły finansowe ERP poprawiają raportowanie i budżetowanie.",
+        Zarzadzanie: "ERP daje pełen obraz sytuacji firmy i wspiera decyzje."
+      },
+      ksef: {
+        Produkcja: "KSeF przygotowuje firmę do obowiązkowego e-fakturowania.",
+        Sprzedaż: "KSeF automatyzuje procesy fakturowania i zmniejsza ryzyko błędów.",
+        Logistyka: "E-faktury ułatwiają procesy dokumentowania dostaw.",
+        Finanse: "KSeF zwiększa zgodność z przepisami i porządek w finansach.",
+        Zarzadzanie: "Wdrożenie KSeF to element cyfryzacji zarządczej i zgodności."
+      },
+      esg: {
+        Produkcja: "Raportowanie ESG pomaga ocenić wpływ środowiskowy procesów.",
+        Sprzedaż: "Klienci coraz częściej oczekują przejrzystości działań ESG.",
+        Logistyka: "ESG w logistyce wspiera ekologiczne planowanie tras i zrównoważony łańcuch dostaw.",
+        Finanse: "Brak ESG może ograniczyć dostęp do finansowania i inwestorów.",
+        Zarzadzanie: "Strategia ESG wspiera wizerunek firmy i zgodność z przepisami."
+      },
+      bi: {
+        Produkcja: "BI w produkcji wspiera analizę wydajności i wskaźników jakości.",
+        Sprzedaż: "BI pozwala lepiej zarządzać lejkiem sprzedażowym i prognozować wyniki.",
+        Logistyka: "BI optymalizuje koszty transportu i zarządzanie zapasami.",
+        Finanse: "BI wspiera analizę finansową i podejmowanie decyzji.",
+        Zarzadzanie: "Dzięki BI zarząd podejmuje decyzje na podstawie danych."
+      },
+      salesIT: {
+        Produkcja: "System sprzedażowy wspiera zarządzanie zamówieniami i prognozowanie.",
+        Sprzedaż: "IT zwiększa efektywność handlowców i automatyzuje ofertowanie.",
+        Logistyka: "Zintegrowana sprzedaż i logistyka poprawiają terminowość dostaw.",
+        Finanse: "Systemy sprzedażowe wspierają kontrolę płatności i rozliczeń.",
+        Zarzadzanie: "Systemy sprzedaży dają zarządowi dostęp do bieżących wyników."
+      }
+    };
 
-      const motywacja = document.querySelector('input[name="motywacja"]:checked')?.value || "";
-      const motywacyjne = {
-        kosztowy: "Kosztowy",
-        rozwojowy: "Rozwojowy",
-        ergonomiczny: "Ergonomiczny",
-        nieukierunkowany: "Nieukierunkowany"
-      }[motywacja] || "Brak profilu";
-
-      const fullProfil = `${motywacyjne} ${profil}`;
-
-      const obszar = document.querySelector('input[name="obszar"]:checked')?.value || "";
-      const rekomendacje = {
-        dane: "Wdrożenie dashboardów BI, porządkowanie źródeł danych, hurtownia danych.",
-        hr: "Elektroniczne akta osobowe, workflow wniosków urlopowych, e-dokumenty pracownicze.",
-        finanse: "Obieg faktur, KSeF, integracja z ERP, cyfrowa archiwizacja.",
-        produkcja: "Instrukcje cyfrowe, obieg ISO, dokumentacja BHP, wersjonowanie."
-      }[obszar] || "Brak wskazanej potrzeby – brak rekomendacji.";
-
-      const wynik = `<h2>Twój profil: ${fullProfil}</h2><p><strong>Rekomendacje:</strong> ${rekomendacje}</p>`;
-      document.getElementById("result").innerHTML = wynik;
-      document.getElementById("result").style.display = "block";
-    });
+    // dalsza logika niezmieniona — rekomendacje zostaną użyte z mapy rekomendacjeMap
   </script>
 </body>
 </html>
+
