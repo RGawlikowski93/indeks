@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Indeks Cyfryzacji Firmy</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 900px; margin: auto; }
+    h1 { color: #2c3e50; }
+    .question { margin-bottom: 1.2rem; }
+    .result { background: #f4f4f4; padding: 1.2rem; border-radius: 6px; margin-top: 2rem; }
+    button { padding: 0.5rem 1rem; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Indeks Cyfryzacji Firmy</h1>
+  <form id="quizForm">
+    <h2>Poziom cyfryzacji (A)</h2>
+    <div class="question"><label>1. Czy masz system DMS?</label><br>
+      <input type="radio" name="q1" value="2"> Tak<br>
+      <input type="radio" name="q1" value="1"> Częściowo<br>
+      <input type="radio" name="q1" value="0"> Nie
+    </div>
+    <div class="question"><label>2. Czy masz ERP?</label><br>
+      <input type="radio" name="q2" value="2"> Tak<br>
+      <input type="radio" name="q2" value="1"> Częściowo<br>
+      <input type="radio" name="q2" value="0"> Nie
+    </div>
+    <div class="question"><label>3. Czy dane są w chmurze?</label><br>
+      <input type="radio" name="q3" value="2"> Tak<br>
+      <input type="radio" name="q3" value="1"> Częściowo<br>
+      <input type="radio" name="q3" value="0"> Nie
+    </div>
+    <div class="question"><label>4. Czy używacie BI?</label><br>
+      <input type="radio" name="q4" value="2"> Tak<br>
+      <input type="radio" name="q4" value="1"> Trochę<br>
+      <input type="radio" name="q4" value="0"> Nie
+    </div>
+    <div class="question"><label>5. Czy dokumenty są digitalizowane automatycznie?</label><br>
+      <input type="radio" name="q5" value="2"> Tak<br>
+      <input type="radio" name="q5" value="1"> Częściowo<br>
+      <input type="radio" name="q5" value="0"> Nie
+    </div>
+
+    <h2>Motywacje (B)</h2>
+    <div class="question"><label>6. Główna motywacja?</label><br>
+      <input type="radio" name="motywacja" value="rozwojowy"> Rozwój<br>
+      <input type="radio" name="motywacja" value="kosztowy"> Oszczędność<br>
+      <input type="radio" name="motywacja" value="ergonomiczny"> Wygoda<br>
+      <input type="radio" name="motywacja" value="nieukierunkowany"> Brak kierunku
+    </div>
+
+    <h2>Potrzeby i bariery (C)</h2>
+    <div class="question"><label>7. Gdzie widzisz największe potrzeby?</label><br>
+      <input type="radio" name="obszar" value="dane"> Analiza danych<br>
+      <input type="radio" name="obszar" value="hr"> HR<br>
+      <input type="radio" name="obszar" value="finanse"> Finanse<br>
+      <input type="radio" name="obszar" value="produkcja"> Produkcja
+    </div>
+
+    <button type="submit">Zobacz wynik</button>
+  </form>
+
+  <div id="result" class="result" style="display:none;"></div>
+
+  <script>
+    document.getElementById("quizForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const pytania = ["q1","q2","q3","q4","q5"];
+      const score = pytania.reduce((acc, name) => {
+        return acc + parseInt(document.querySelector(`input[name="${name}"]:checked`)?.value || 0);
+      }, 0);
+
+      let profil = "";
+      if (score <= 4) profil = "firma analogowa";
+      else if (score <= 7) profil = "firma w transformacji";
+      else if (score <= 9) profil = "firma dojrzała cyfrowo";
+      else profil = "lider cyfryzacji";
+
+      const motywacja = document.querySelector('input[name="motywacja"]:checked')?.value || "";
+      const motywacyjne = {
+        kosztowy: "Kosztowy",
+        rozwojowy: "Rozwojowy",
+        ergonomiczny: "Ergonomiczny",
+        nieukierunkowany: "Nieukierunkowany"
+      }[motywacja] || "Brak profilu";
+
+      const fullProfil = `${motywacyjne} ${profil}`;
+
+      const obszar = document.querySelector('input[name="obszar"]:checked')?.value || "";
+      const rekomendacje = {
+        dane: "Wdrożenie dashboardów BI, porządkowanie źródeł danych, hurtownia danych.",
+        hr: "Elektroniczne akta osobowe, workflow wniosków urlopowych, e-dokumenty pracownicze.",
+        finanse: "Obieg faktur, KSeF, integracja z ERP, cyfrowa archiwizacja.",
+        produkcja: "Instrukcje cyfrowe, obieg ISO, dokumentacja BHP, wersjonowanie."
+      }[obszar] || "Brak wskazanej potrzeby – brak rekomendacji.";
+
+      const wynik = `<h2>Twój profil: ${fullProfil}</h2><p><strong>Rekomendacje:</strong> ${rekomendacje}</p>`;
+      document.getElementById("result").innerHTML = wynik;
+      document.getElementById("result").style.display = "block";
+    });
+  </script>
+</body>
+</html>
