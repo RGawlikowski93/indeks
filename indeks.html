@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indeks Cyfryzacji Firmy</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 800px; margin: auto; }
+    .bar-container {
+      background: #eee;
+      border-radius: 8px;
+      overflow: hidden;
+      height: 24px;
+      margin-top: 4px;
+    }
+    .bar-fill {
+      height: 100%;
+      transition: width 0.5s;
+    }
+    .result-bar {
+      margin-bottom: 1.5rem;
+    }
+    .result-bar-title {
+      font-weight: bold;
+      margin-bottom: 2px;
+    }
+    .result-bar-label {
+      font-size: 0.85em;
+      color: #444;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Indeks Cyfryzacji Firmy</h1>
+  <div class="result-bar">
+    <div class="result-bar-title">Czy firma korzysta z rozwiązań chmurowych?</div>
+    <div class="bar-container">
+      <div class="bar-fill" style="width: 50%; background: #4caf50;"></div>
+    </div>
+    <div class="result-bar-label">Jesteś w gronie 50% firm, które odpowiedziały tak samo</div>
+  </div>
+  <div class="result-bar">
+    <div class="result-bar-title">Czy znasz obszary, w których można wdrożyć AI?</div>
+    <div class="bar-container">
+      <div class="bar-fill" style="width: 51%; background: #4caf50;"></div>
+    </div>
+    <div class="result-bar-label">Jesteś w gronie 51% firm, które odpowiedziały tak samo</div>
+  </div>
+  <div class="result-bar">
+    <div class="result-bar-title">Czy dane z produkcji są zapisywane na papierze?</div>
+    <div class="bar-container">
+      <div class="bar-fill" style="width: 83%; background: #4caf50;"></div>
+    </div>
+    <div class="result-bar-label">Jesteś w gronie 83% firm, które odpowiedziały tak samo</div>
+  </div>
+  <div class="result-bar">
+    <div class="result-bar-title">Czy używasz systemu APS?</div>
+    <div class="bar-container">
+      <div class="bar-fill" style="width: 6%; background: #4caf50;"></div>
+    </div>
+    <div class="result-bar-label">Jesteś w gronie 6% firm, które odpowiedziały tak samo</div>
+  </div>
+</body>
+</html>
